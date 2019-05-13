@@ -1,39 +1,57 @@
-import React from 'react';
+import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import styled from 'styled-components';
+import List from './components/List';
 
-const list = [
-	{id: 0, label: 'foo', checked: false},
-	{id: 2, label: 'foo 2', checked: true},
-	{id: 1, label: 'foo 1', checked: false}
-];
-
-const App = () => (
-	<Page>
-		<Container>
-			<Title>my todo list</Title>
-			<Card>
-				
-				<StyledInput placeholder="the placeholder"/>
-				<Button>add new item</Button>
-				
-				<Divider/>
-				
-				<List>
-					{
-						list.map(item => (
-							<Item key={item.id}>
-								<Checkbox checked={item.checked}/>
-								<Label>{item.label}</Label>
-							</Item>
-						))
-					}
-				</List>
-			</Card>
-		</Container>
-	</Page>
-);
+class App extends Component {
+	state = {
+		list: [
+			{id: 0, label: 'foo', checked: false},
+			{id: 2, label: 'foo 2', checked: true},
+			{id: 1, label: 'foo 1', checked: false}
+		]
+	};
+	
+	handleClick = () => {
+		const newItem = {
+			id: this.state.list.length,
+			label: this.foo.value || 'untitled',
+			checked: false
+		};
+		
+		this.setState({list: [...this.state.list, newItem]});
+	};
+	
+	handleRef = el => {
+		this.foo = el;
+	};
+	
+	render() {
+		const {list} = this.state;
+		
+		return (
+			<Page>
+				<Container>
+					<Title>my todo list</Title>
+					<Card>
+						
+						<StyledInput
+							placeholder="the placeholder"
+							ref={this.handleRef}
+						/>
+						
+						<Button onClick={this.handleClick}>add new item</Button>
+						
+						<Divider/>
+						
+						<List data={list}/>
+					</Card>
+				</Container>
+			</Page>
+		);
+	}
+}
 
 const Page = styled.div`
 	width: 100vw;
@@ -65,35 +83,11 @@ const Card = styled.div`
 	padding: 40px;
 `;
 
-const Item = styled.div`
-	margin: 6px 0;
-	display: flex;
-	align-items: center;
-`;
-
-const Label = styled.div`
-	font-size: 24px;
-  color: #444;
-`;
-
-const Checkbox = styled.div`
-	width: 10px;
-	height: 10px;
-	border-radius: 50%;
-	border: 1px solid #000;
-	margin-right: 10px;
-`;
-
 const Divider = styled.div`
 	height: 1px;
 	width: 100%;
 	background: #979797;
 	margin: 20px 0;
-`;
-
-const List = styled.div`
-	display: flex;
-	flex-direction: column;
 `;
 
 const StyledInput = styled.input`
