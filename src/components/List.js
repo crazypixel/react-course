@@ -1,6 +1,8 @@
 import React, {Component} from 'react';
 import styled from 'styled-components';
 import Fade from 'react-reveal/Fade';
+import {connect} from "react-redux";
+import {addItem, setRating, fetchItems} from '../redux/actions/list.actions';
 
 // components
 import Button from './common/Button';
@@ -9,31 +11,22 @@ import Input from './common/Input';
 import Rating from './common/Rating';
 
 class List extends Component {
-	state = {
-		data: [
-			{id: 0, label: 'foo', rating: 0},
-			{id: 1, label: 'foo1', rating: 0},
-			{id: 2, label: 'foo2', rating: 0},
-		]
-	};
+	componentDidMount() {
+		this.props.fetchItems();
+	}
 	
 	addItem = () => {
 		if (!this.input.value) {
 			return;
 		}
 		
-		this.setState({
-			data: [
-				...this.state.data,
-				{
-					id: this.state.data.length,
-					label: this.input.value,
-					rating: 0
-				}
-			]
-		}, () => {
-			this.input.value = '';
+		this.props.addItem({
+			id: this.props.data.length,
+			label: this.input.value,
+			rating: 0
 		});
+		
+		this.input.value = '';
 	};
 	
 	handleKeyUp = e => {
@@ -43,16 +36,11 @@ class List extends Component {
 	};
 	
 	setRating = (id, total) => {
-		this.setState({
-			data: this.state.data.map(obj => ({
-				...obj,
-				rating: obj.id === id ? total : obj.rating
-			}))
-		});
+		this.props.setRating(id, total);
 	};
 	
 	render() {
-		const {data} = this.state;
+		const {data} = this.props;
 		
 		return (
 			<Container>
@@ -67,26 +55,32 @@ class List extends Component {
 					</StyledCard>
 				</Fade>
 				
-				<Fade>
-					{
-						data.map(item => (
-							<StyledCard key={item.id}>
-								<Label>{item.label}</Label>
-								<Rating
-									amount={6}
-									value={item.rating}
-									onClick={total => this.setRating(item.id, total)}
-								/>
-							</StyledCard>
-						))
-					}
-				</Fade>
+				{
+					data.map(item => (
+						<StyledCard key={item.id}>
+							<Label>{item.label}</Label>
+							<Rating
+								amount={6}
+								value={item.rating}
+								onClick={total => this.setRating(item.id, total)}
+							/>
+						</StyledCard>
+					))
+				}
 			</Container>
 		);
 	}
 }
 
-export default List;
+const mapStateToProps = state => ({
+	data: state.list
+});
+
+export default connect(mapStateToProps, {
+	addItem,
+	setRating,
+	fetchItems
+})(List);
 
 const Container = styled.div`
 	width: 100vw;
